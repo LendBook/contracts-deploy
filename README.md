@@ -57,10 +57,14 @@ npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify 
 ```
 
 lbUSDC#Lbusdc - 0xB1aEa92D4BF0BFBc2C5bA679A2819Efefc998CEB
+lbUSDC : https://sepolia.etherscan.io/address/0xb1aea92d4bf0bfbc2c5ba679a2819efefc998ceb
 
 lbWETH#Lbweth - 0x25b8e42bdFC4cf8268B56B049d5C730762035407
+lbWETH : https://sepolia.etherscan.io/address/0x25b8e42bdFC4cf8268B56B049d5C730762035407
 
 book#Book -  0x5868e02b167C2bEe1C1a16eed9a474A792912ebF
+Book : https://sepolia.etherscan.io/address/0x5868e02b167C2bEe1C1a16eed9a474A792912ebF
+
 
 then
 ```

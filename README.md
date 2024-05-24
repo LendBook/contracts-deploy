@@ -19,6 +19,14 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts
 nvm use 20
 ```
 
+Need to set some variables https://hardhat.org/hardhat-runner/docs/guides/configuration-variables
+
+```
+npx hardhat vars set SEPOLIA_PRIVATE_KEY # wallet private key !
+npx hardhat vars set ETHERSCAN_API_KEY # to verify the deployed smart contracts
+npx hardhat vars set ALCHEMY_API_KEY # to connect with rpc
+npx hardhat vars list
+```
 
 ### To Deploy locally
 

@@ -12,6 +12,21 @@ npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Lock.ts
 ```
 
+## install packages
+
+need to install chainlink for example : 
+```
+npm install @chainlink/contracts --save
+```
+
+Need to change the call of packages and comment this line in Book.sol:
+```
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IBook} from "./interfaces/IBook.sol";
+import {MathLib, WAD} from "../lib/MathLib.sol";
+//import {console} from "forge-std/Test.sol";
+```
 
 ## Deploy
 
@@ -50,10 +65,12 @@ Book.sol is too big, so need to have in hardhat.congif.ts :
 
 
 ### To Deploy on Sepolia
+
+Besoin de changer la variable final de la requete "sepolia-fourth"
 ```
 npx hardhat ignition deploy ignition/modules/LBUSDC.ts --network sepolia --verify --deployment-id sepolia-fourth
 npx hardhat ignition deploy ignition/modules/LBWETH.ts --network sepolia --verify --deployment-id sepolia-fourth
-npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-fourth
+npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240716
 ```
 
 lbUSDC#Lbusdc - 0xB1aEa92D4BF0BFBc2C5bA679A2819Efefc998CEB
@@ -62,8 +79,8 @@ lbUSDC : https://sepolia.etherscan.io/address/0xb1aea92d4bf0bfbc2c5ba679a2819efe
 lbWETH#Lbweth - 0x25b8e42bdFC4cf8268B56B049d5C730762035407
 lbWETH : https://sepolia.etherscan.io/address/0x25b8e42bdFC4cf8268B56B049d5C730762035407
 
-book#Book -  0x5868e02b167C2bEe1C1a16eed9a474A792912ebF
-Book : https://sepolia.etherscan.io/address/0x5868e02b167C2bEe1C1a16eed9a474A792912ebF
+book#Book -  0x921BC5eA233bCDcF99C150B9A5A4c8d52dfd5F12
+Book : https://sepolia.etherscan.io/address/0x921BC5eA233bCDcF99C150B9A5A4c8d52dfd5F12
 
 
 then

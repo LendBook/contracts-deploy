@@ -79,8 +79,8 @@ lbUSDC : https://sepolia.etherscan.io/address/0xb1aea92d4bf0bfbc2c5ba679a2819efe
 lbWETH#Lbweth - 0x25b8e42bdFC4cf8268B56B049d5C730762035407
 lbWETH : https://sepolia.etherscan.io/address/0x25b8e42bdFC4cf8268B56B049d5C730762035407
 
-book#Book -  0x921BC5eA233bCDcF99C150B9A5A4c8d52dfd5F12
-Book : https://sepolia.etherscan.io/address/0x921BC5eA233bCDcF99C150B9A5A4c8d52dfd5F12
+book#Book -  0x722166584cEcBD8B1730e80805437F7B2e5833b1
+Book : https://sepolia.etherscan.io/address/0x722166584cEcBD8B1730e80805437F7B2e5833b1
 
 
 then

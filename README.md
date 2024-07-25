@@ -73,6 +73,8 @@ npx hardhat ignition deploy ignition/modules/LBWETH.ts --network sepolia --verif
 npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240716
 npx hardhat ignition deploy ignition/modules/LBWBTC.ts --network sepolia --verify --deployment-id sepolia-20240722
 npx hardhat ignition deploy ignition/modules/Book_LBWBTC_LBUSDC.ts --network sepolia --verify --deployment-id sepolia-20240722
+npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240725
+npx hardhat ignition deploy ignition/modules/Book_LBWBTC_LBUSDC.ts --network sepolia --verify --deployment-id sepolia-20240725
 ```
 
 lbUSDC#Lbusdc - 0xB1aEa92D4BF0BFBc2C5bA679A2819Efefc998CEB
@@ -81,14 +83,15 @@ lbUSDC : https://sepolia.etherscan.io/address/0xb1aea92d4bf0bfbc2c5ba679a2819efe
 lbWETH#Lbweth - 0x25b8e42bdFC4cf8268B56B049d5C730762035407
 lbWETH : https://sepolia.etherscan.io/address/0x25b8e42bdFC4cf8268B56B049d5C730762035407
 
-book#Book -  0x722166584cEcBD8B1730e80805437F7B2e5833b1
-Book : https://sepolia.etherscan.io/address/0x722166584cEcBD8B1730e80805437F7B2e5833b1
 
 lbWBTC#Lbwbtc -  0x9bd36ff85fcAb8a68b62984E8526BeD5C1Bead31
 lbWBTC : https://sepolia.etherscan.io/address/0x9bd36ff85fcAb8a68b62984E8526BeD5C1Bead31
 
-book_btc#Book_BTC -  0x5BEd8d050c7e574604e0f6Db9e171c171C642187
-Book_BTC : https://sepolia.etherscan.io/address/0x5BEd8d050c7e574604e0f6Db9e171c171C642187
+book_btc#Book_BTC -  0xC9cd8eb550c1861283D25DA9D4Fe227EEDA14105
+Book_BTC : https://sepolia.etherscan.io/address/0xC9cd8eb550c1861283D25DA9D4Fe227EEDA14105
+
+book#Book -  0x7F56bc893817380165C01e8A4894A30f21610654
+Book : https://sepolia.etherscan.io/address/0x7F56bc893817380165C01e8A4894A30f21610654
 
 then
 ```

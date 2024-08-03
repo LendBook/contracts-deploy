@@ -13,6 +13,7 @@ import {IBook} from "./interfaces/IBook.sol";
 import {MathLib, WAD} from "../lib/MathLib.sol";
 //import {console} from "forge-std/Test.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+//import "hardhat/console.sol";
 
 contract Book is IBook {
     using MathLib for uint256; 
@@ -497,7 +498,7 @@ contract Book is IBook {
         // console.log("*** Repay ***");
         // console.log("Repayer :", msg.sender);
         // console.log("Repayed quantity :", _quantity / WAD, "USDC");
-        
+
         require(_quantity > 0, "Repay zero");
         
         Position memory position = positions[_positionId];
@@ -527,12 +528,10 @@ contract Book is IBook {
         // decrease borrowed assets in position, possibly to zero
         positions[_positionId].borrowedAssets -= _quantity;
 
-        // console.log("Borrowed assets + interest rate after repay :", positions[_positionId].borrowedAssets / WAD, "USDC");
 
         // decrease borrowed assets in pool's total borrow (check no asset mismatch)
         pools[position.poolId].borrows -= _quantity;
 
-        // console.log("Utilization rate post repay* 1e4:", 1e4 * viewUtilizationRate(position.poolId) / WAD);
 
         // transfer quote assets from repayer
         _transferFrom(msg.sender, _quantity, IN_QUOTE);

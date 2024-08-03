@@ -8,7 +8,7 @@ const baseToken : string = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; //"0xB2
 // Échelle de base pour les valeurs en wei (10^18)
 const wad = 10n**18n;
 // Prix limite du pool genesis, soit un pool d'achat ou de vente, à ne pas confondre avec le flux de prix
-const genesisLimitPrice = 4000n*wad;
+const genesisLimitPrice = 3200n*wad;
 
 // Pas de prix pour placer des ordres : +/- 10%
 const priceStep = 11n*wad/10n;

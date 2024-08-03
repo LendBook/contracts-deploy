@@ -48,7 +48,15 @@ npx hardhat vars list
 ```
 npx hardhat node
 npx hardhat ignition deploy ignition/modules/BookTest.ts --network localhost --deployment-id second-deploy
+npx hardhat ignition deploy ignition/modules/LBUSDC.ts --network localhost  --deployment-id local-20240803
+npx hardhat ignition deploy ignition/modules/LBWETH.ts --network localhost  --deployment-id local-20240803
+npx hardhat ignition deploy ignition/modules/BookTest.ts --network localhost --deployment-id local-20240803
 ```
+
+lbUSDC#Lbusdc - 0x5FbDB2315678afecb367f032d93F642f64180aa3
+lbWETH#Lbweth - 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+
+
 
 Book.sol is too big, so need to have in hardhat.congif.ts :
 ```
@@ -75,6 +83,9 @@ npx hardhat ignition deploy ignition/modules/LBWBTC.ts --network sepolia --verif
 npx hardhat ignition deploy ignition/modules/Book_LBWBTC_LBUSDC.ts --network sepolia --verify --deployment-id sepolia-20240722
 npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240725
 npx hardhat ignition deploy ignition/modules/Book_LBWBTC_LBUSDC.ts --network sepolia --verify --deployment-id sepolia-20240725
+npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240803
+npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240803withEvents
+npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240803bis
 ```
 
 lbUSDC#Lbusdc - 0xB1aEa92D4BF0BFBc2C5bA679A2819Efefc998CEB
@@ -92,6 +103,18 @@ Book_BTC : https://sepolia.etherscan.io/address/0xC9cd8eb550c1861283D25DA9D4Fe22
 
 book#Book -  0x7F56bc893817380165C01e8A4894A30f21610654
 Book : https://sepolia.etherscan.io/address/0x7F56bc893817380165C01e8A4894A30f21610654
+
+
+book#Book - 0x0EDfc9212B4304bE1C656c6Aecb88a223874Ea91
+https://sepolia.etherscan.io/address/0x0EDfc9212B4304bE1C656c6Aecb88a223874Ea91#code
+
+
+book#Book - 0x4F29DaE8fFB8DB27474A774Baf5ee0A06d082389
+https://sepolia.etherscan.io/address/0x4F29DaE8fFB8DB27474A774Baf5ee0A06d082389#code
+
+
+book#Book - 0xa80291B8b0Ae2455698f865aF967EEd325D45834
+https://sepolia.etherscan.io/address/0xa80291B8b0Ae2455698f865aF967EEd325D45834#code
 
 then
 ```

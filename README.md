@@ -86,6 +86,7 @@ npx hardhat ignition deploy ignition/modules/Book_LBWBTC_LBUSDC.ts --network sep
 npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240803
 npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240803withEvents
 npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240803bis
+npx hardhat ignition deploy ignition/modules/Book.ts --network sepolia --verify --deployment-id sepolia-20240810
 ```
 
 lbUSDC#Lbusdc - 0xB1aEa92D4BF0BFBc2C5bA679A2819Efefc998CEB
@@ -115,6 +116,9 @@ https://sepolia.etherscan.io/address/0x4F29DaE8fFB8DB27474A774Baf5ee0A06d082389#
 
 book#Book - 0xa80291B8b0Ae2455698f865aF967EEd325D45834
 https://sepolia.etherscan.io/address/0xa80291B8b0Ae2455698f865aF967EEd325D45834#code
+
+book#Book - 0x5b0D0DDB7860eaEed42AE95b05A7d2df9877aD25
+https://sepolia.etherscan.io/address/0x5b0D0DDB7860eaEed42AE95b05A7d2df9877aD25#code
 
 then
 ```

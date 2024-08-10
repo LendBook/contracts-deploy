@@ -55,9 +55,9 @@ contract Book is IBook {
     // round up in conversions (ease reading in function attributes)
     bool constant private ROUNDUP = true; 
     // IRM parameter = 0.005
-    uint256 public constant ALPHA = 5 * WAD / 1e3;
+    uint256 public constant ALPHA = 5 * WAD / 1e03;
     // IRM parameter = 0.015
-    uint256 public constant BETA = 15 * WAD / 1e3;
+    uint256 public constant BETA = 15 * WAD / 1e03;
     // uint256 public constant GAMMA = 10 * WAD / 1e3; // IRM parameter =  0.01
     // ALTV = 98% = to put in the constructor
     // uint256 public constant ALTV = 98 * WAD / 100;
@@ -180,6 +180,8 @@ contract Book is IBook {
     AggregatorV3Interface internal chainlinkFeed;
     // whether price feed is pulled from Chainlink or is set manually
     bool public chainlinkFeedIsActive = false;
+    //
+    // uint256 lastBlockTimestamp;
 
     // *** CONSTRUCTOR *** //
  
@@ -218,7 +220,8 @@ contract Book is IBook {
     /// - paired pool id is hard coded to 0 => converted assets are deposited in user's quote account
     /// if lenders deposit quote assets:
     /// - specifying pool id is mandatory
-    /// - by default, paired pool id is at the same limit price, or in advanced mode at user's discretion
+    /// - by default, paired pool id is at the same limit price sell-side (= poolId + 1),
+    /// or in advanced mode at user's discretion
 
     function deposit(
         uint256 _poolId,
@@ -386,7 +389,7 @@ contract Book is IBook {
 
         // console.log("Total deposits after substraction:", pools[order.poolId].deposits / WAD, "ETH");
 
-        // console.log("Utilization rate post withdraw 1e4:", 1e4 * viewUtilizationRate(order.poolId) / WAD);
+        // console.log("Utilization rate post withdraw e04:", 1e4 * viewUtilizationRate(order.poolId) / WAD);
 
         // transfer quote or base assets to withdrawer
         _transferTo(msg.sender, _removedQuantity, isBuyOrder);
@@ -441,7 +444,7 @@ contract Book is IBook {
         uint256 scaledUpMinusCollateral = 
             _convert(_quantity, limitPrice[_poolId], IN_QUOTE, ROUNDUP).wDivUp(liquidationLTV);
 
-        // console.log("Additional required collateral x 100:", 100 * scaledUpMinusCollateral / WAD, "ETH");
+        // console.log("Additional required collateral e02 :", 100 * scaledUpMinusCollateral / WAD, "ETH");
 
         // check borrowed amount is collateralized enough by borrower's own orders
         // if collateral needed to borrow X is deduced from existing collateral, is user still solvent?
@@ -476,7 +479,7 @@ contract Book is IBook {
 
         // console.log("Borrowable assets in pool after borrow :", viewPoolAvailableAssets(_poolId) / WAD, "USDC");
 
-        // console.log("Utilization rate post borrow* 1e4:", 1e4 * viewUtilizationRate(_poolId) / WAD);
+        // console.log("Utilization rate post borrow e04 :", 1e4 * viewUtilizationRate(_poolId) / WAD);
 
         // transfer quote assets to borrower
         _transferTo(msg.sender, _quantity, IN_QUOTE);
@@ -498,7 +501,7 @@ contract Book is IBook {
         // console.log("*** Repay ***");
         // console.log("Repayer :", msg.sender);
         // console.log("Repayed quantity :", _quantity / WAD, "USDC");
-
+        
         require(_quantity > 0, "Repay zero");
         
         Position memory position = positions[_positionId];
@@ -506,8 +509,8 @@ contract Book is IBook {
         // borrow to repay must be positive
         require(position.borrowedAssets > 0, "Not borrowing");
         
-        // assets repaid by borrower, not someone else
-        require(position.borrower == msg.sender, "Not Borrower");
+        // assets are repaid by borrower or someone else
+        // require(position.borrower == msg.sender, "Not Borrower");
 
         // repay must be in quote tokens
         require(_isQuotePool(position.poolId), "Non borrowable pool");
@@ -528,10 +531,13 @@ contract Book is IBook {
         // decrease borrowed assets in position, possibly to zero
         positions[_positionId].borrowedAssets -= _quantity;
 
+        // console.log("User's borrowed assets + interest rate after repay e02 :", 1e18 * positions[_positionId].borrowedAssets / WAD, "USDC");
 
         // decrease borrowed assets in pool's total borrow (check no asset mismatch)
         pools[position.poolId].borrows -= _quantity;
 
+        // console.log("Total borrowed assets + interest rate after repay e02 : ", 1e18 * positions[_positionId].borrowedAssets / WAD, "USDC");
+        // console.log("Utilization rate after repay e04 :", 1e4 * viewUtilizationRate(position.poolId) / WAD);
 
         // transfer quote assets from repayer
         _transferFrom(msg.sender, _quantity, IN_QUOTE);
@@ -642,7 +648,7 @@ contract Book is IBook {
 
         // console.log("pool.deposits after take :", pool.deposits / WAD, "USDC");
         // console.log("pool.borrows after take :", pool.borrows / WAD, "USDC");
-        // console.log("Utilization rate after take* 1e4:", 1e4 * viewUtilizationRate(_poolId) / WAD);
+        // console.log("Utilization rate after take* e04:", 1e4 * viewUtilizationRate(_poolId) / WAD);
 
         // transfer base assets from taker
         _transferFrom(msg.sender, receivedAssets, !IN_QUOTE);
@@ -994,7 +1000,7 @@ contract Book is IBook {
             // which position in pool is closed
             uint256 positionId = pool.positionIds[row];
 
-            // console.log("         --> PositionId of next position to be closed: ", positionId);
+            // console.log("         --> Position id of next position to be closed :", positionId);
 
             // check user has still borrowed assets in pool
             if (positions[positionId].borrowedAssets == 0) continue;
@@ -1033,13 +1039,13 @@ contract Book is IBook {
 
     /// @notice cancel full debt of one position
     /// write off collateral assets for the exact amount
-    /// @return liquidatedAssets_ 
+    /// @return liquidatedAssets_ the amount of borrowed quote assets canceled off
     
     function _closePosition(uint256 positionId)
         internal
         returns (uint256 liquidatedAssets_)
     {
-        // console.log("         * _closePosition *");
+        // console.log("           Enter closePosition(positionId)");
 
         uint256 poolId = positions[positionId].poolId;
         
@@ -1049,8 +1055,8 @@ contract Book is IBook {
 
         liquidatedAssets_ = positions[positionId].borrowedAssets;
 
-        // console.log("            Total borrowed assets in pool before liquidation :", pools[poolId].borrows / WAD, "USDC");
-        // console.log("            liquidated borrowed assets (in full) :", liquidatedAssets_ / WAD, "USDC");
+        // console.log("            Total borrowed assets in pool before liquidation e18 :", 1e18 * pools[poolId].borrows / WAD, "USDC");
+        // console.log("            Liquidated borrowed assets (in full) e18 :            ", 1e18 * liquidatedAssets_ / WAD, "USDC");
 
         // decrease borrowed assets in pool's total borrow
         pools[poolId].borrows = _substract(pools[poolId].borrows, liquidatedAssets_, "err_02", !RECOVER);
@@ -1060,7 +1066,7 @@ contract Book is IBook {
         // decrease borrowed assets to zero
         positions[positionId].borrowedAssets = 0;
 
-        // console.log("         * Exit _closePosition *");
+        // console.log("           Exit closePosition(positionId)");
     }
 
     /// @notice close buy orders for exact amount of liquidated quote assets and taken quote quantity in same pool
@@ -1602,20 +1608,20 @@ contract Book is IBook {
         
         pools[_poolId].timeWeightedRate += _getPoolDeltaTimeWeightedRate;
 
-        // console.log("   updated pools[_poolId].timeWeightedRate :  ", _getPoolDeltaTimeWeightedRate);
+        // console.log("                  > update pools[_poolId].timeWeightedRate : ", _getPoolDeltaTimeWeightedRate);
 
         // add interest rate to time- and UR-weighted interest rate
         pools[_poolId].timeUrWeightedRate += _getPoolDeltaTimeWeightedRate.wMulDown(viewUtilizationRate(_poolId));
 
-        // console.log("   updated pools[_poolId].timeUrWeightedRate :", pools[_poolId].timeUrWeightedRate);
+        // console.log("                  > update pools[_poolId].timeUrWeightedRate :", pools[_poolId].timeUrWeightedRate);
 
         // add interest rate exp[ (n_t - n_{t-1}) * IR_{t-1} / N ] - 1 to total borrow in pool
 
         uint256 poolBorrow = pools[_poolId].borrows;
 
-        pools[_poolId].borrows = poolBorrow + _getPoolDeltaTimeWeightedRate.wTaylorCompoundedUp().wMulDown(poolBorrow);
+        pools[_poolId].borrows = poolBorrow + _getPoolDeltaTimeWeightedRate.wTaylorCompoundedUp().wMulUp(poolBorrow);
 
-        // console.log("   update pools[_poolId].borrows : ", pools[_poolId].borrows);
+        // console.log("                  > update pools[_poolId].borrows e02 : ", 1e18 * pools[_poolId].borrows / WAD, " USDC");
 
         // add interest rate to total deposits in pool
 
@@ -1626,7 +1632,7 @@ contract Book is IBook {
 
         pools[_poolId].deposits = poolDeposit + deltaTimeUrWeightedRate.wTaylorCompoundedUp().wMulDown(poolDeposit);
 
-        // console.log("   updated pools[_poolId].deposits : ", pools[_poolId].deposits / WAD);
+        // console.log("                  > update pools[_poolId].deposits e02 : ", 1e18 * pools[_poolId].deposits / WAD);
 
         // reset clock
         pools[_poolId].lastTimeStamp = block.timestamp;
@@ -1641,17 +1647,20 @@ contract Book is IBook {
     function _addInterestRateToPosition(uint256 _positionId)
         internal
     {
-        // console.log("borrowed amount before interest rate:", positions[_positionId].borrowedAssets / WAD, "USDC");
+        // console.log("               Enter _addInterestRateToPosition(_positionId)");
+        // console.log("                   borrowed amount before interest rate:", positions[_positionId].borrowedAssets / WAD, "USDC");
         
         // multiply interest rate with borrowed quantity and add to borrowed quantity
         positions[_positionId].borrowedAssets = viewUserBorrow(_positionId);
 
-        // console.log("borrowed amount + interest rate :", positions[_positionId].borrowedAssets / WAD, "USDC");
+        // console.log("                     Borrowed amount + interest rate e02 :", 1e18 * positions[_positionId].borrowedAssets / WAD, "USDC");
 
         // update TWIR_t to TWIR_T in position to reset borrowing interest rate to zero
         // assumes timeWeightedRate has been updated before
         
         positions[_positionId].positionWeightedRate = pools[positions[_positionId].poolId].timeWeightedRate;
+
+        // console.log("               Exit _addInterestRateToPosition(_positionId)");
     }
     
     /// @notice calculate accrued interest rate and add to deposit
@@ -1736,7 +1745,7 @@ contract Book is IBook {
         internal view
         returns (bool)
     {
-        // console.log("priceFeed in profitable() :", priceFeed / WAD);
+        // console.log("priceFeed in profitable() :", viewPriceFeed() / WAD);
         
         uint256 priceFeed = viewPriceFeed();
         if (_isQuotePool(_poolId)) return (priceFeed < limitPrice[_poolId]);
@@ -1858,18 +1867,19 @@ contract Book is IBook {
         returns (uint256)
         {
         
-        // console.log("         Enter getPoolDeltaTimeWeightedRate(_poolId)");
-        // console.log("            block.timestamp: ", block.timestamp);
-        // console.log("            pools[_poolId].lastTimeStamp) : ", pools[_poolId].lastTimeStamp);
-        // console.log("            Time passed in second :", (block.timestamp - pools[_poolId].lastTimeStamp).maximum(0));
+        // console.log("                   Enter getPoolDeltaTimeWeightedRate(_poolId)");
+        // console.log("                       block.timestamp : ", block.timestamp);
+        // console.log("                       pools[_poolId].lastTimeStamp : ", pools[_poolId].lastTimeStamp);
+        // console.log("                       time passed in second :", (block.timestamp - pools[_poolId].lastTimeStamp).maximum(0));
 
         // compute (n_t - n_{t-1}) * IR_{t-1} / N
         // (n_t - n_{t-1}) number of seconds since last update, N number of seconds in a year (integer)
         // IR_{t-1} annual interest rate, IR_{t-1} / N instant rate
+        // bug if elapesed time has been updated to zero in the same transaction
 
         uint256 elapsedTime = (block.timestamp - pools[_poolId].lastTimeStamp).maximum(0);
 
-        // console.log("         Exit getPoolDeltaTimeWeightedRate(_poolId)");
+        // console.log("                   Exit getPoolDeltaTimeWeightedRate(_poolId)");
         
         return elapsedTime.mulDivUp(viewBorrowingRate(_poolId), YEAR);
     }
@@ -1931,7 +1941,7 @@ contract Book is IBook {
         if (poolDeposits == 0) utilizationRate_ = 0;
         else utilizationRate_ = pools[_poolId].borrows.mulDivUp(WAD, poolDeposits);
 
-        // console.log("      viewutilizationRate 1e4 : ", 1e4 * utilizationRate_ / WAD);
+        // console.log("                  viewutilizationRate e04 :", 1e4 * utilizationRate_ / WAD);
     }
 
     // view current annualized borrowing interest rate for pool
@@ -1978,10 +1988,10 @@ contract Book is IBook {
     }
     
     /// @notice compute interest rate since start of borrowing position between t and T
-    /// assumes pools[_poolId].timeWeightedRate is up to date 
     /// 1$ borrowed accumulates (exp(TWIR_T - TWIR_t) - 1) interest rate between t and T
     /// exp(TWIR_T - TWIR_t) - 1 is computed using a 3rd order Taylor approximation
     /// pool's timeWeightedRate is not necessarily up-to-date
+    /// In that case, getPoolDeltaTimeWeightedRate(_poolId) fills the gap, is zero otherwise
     
     function viewUserBorrow(uint256 _positionId)
         public view
@@ -2060,7 +2070,7 @@ contract Book is IBook {
         public view
         returns (uint256 requiredCollateral_)
     {
-        // console.log("      Enter __userRequiredCollateral()");
+        // console.log("      Enter viewUserRequiredCollateral(address _borrower)");
         
         requiredCollateral_ = 0;
 
@@ -2087,7 +2097,7 @@ contract Book is IBook {
             }
         }
 
-        // console.log("      Exit __userRequiredCollateral()");
+        // console.log("      viewUserRequiredCollateral(address _borrower)");
     }
 
     /// @notice return excess collateral (EC) in base tokens after deduction of _minusCollateral (MC)
@@ -2121,7 +2131,7 @@ contract Book is IBook {
         uint256 userRequiredCollateral = viewUserRequiredCollateral(_user).wDivUp(liquidationLTV);
 
         // console.log("      Scaled up total required collateral e02: ", 100 * userRequiredCollateral / WAD, "ETH");
-        // console.log("      (Total deposit - reduced collateral) e02 :", 100 * netCollateral / WAD, "ETH");
+        // console.log("      (Borrower's total deposit - reduced collateral) e02 :", 100 * netCollateral / WAD, "ETH");
         // console.log("      Post-action required collateral e02:", 100 * userRequiredCollateral / WAD, "ETH");
 
         // is user EC > 0 return EC, else return - EC
@@ -2154,6 +2164,7 @@ contract Book is IBook {
     {
         return _isBuyOrder == true ? minDepositQuote : minDepositBase;
     }
+
 
     /// @return chainlinkPrice256 latest Chainlink price feed converted in uint256
 
